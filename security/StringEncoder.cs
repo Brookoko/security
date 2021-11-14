@@ -31,7 +31,7 @@ namespace security
 
         private bool IsBinary(string text)
         {
-            return text.All(c => c == 48 || c == 49);
+            return text.All(c => c is '0' or '1');
         }
 
         private byte[] FromBinary(string text)
@@ -44,7 +44,7 @@ namespace security
 
         private bool IsHex(string text)
         {
-            return text.All(c => c >= 48 && c <= 57 || c >= 97 && c <= 102);
+            return text.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f');
         }
 
         private byte[] FromHex(string text)

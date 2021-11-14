@@ -1,5 +1,6 @@
 ﻿namespace security
 {
+    using System;
     using System.IO;
     using System.Linq;
 
@@ -28,7 +29,10 @@
             {
                 aggregate += $"{i}\n{results[i]}\n<---------->\n";
             }
-            File.WriteAllText(GetPathInProject("lab1single-decoded.txt"), aggregate);
+            File.WriteAllText(GetPathInProject("lab1single-decoded-all.txt"), aggregate);
+            var possibleResult = Utils.GetClosestToEnglish(results);
+            Console.WriteLine(possibleResult);
+            File.WriteAllText(GetPathInProject("lab1single-decoded-possible.txt"), possibleResult);
         }
 
         private static byte[] Xor(byte[] bytes, byte k)
