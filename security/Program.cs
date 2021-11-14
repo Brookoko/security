@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Text;
 
     class Program
@@ -14,9 +15,9 @@
 
         private static void DecodeSingleByte()
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             var text = File.ReadAllText(GetPathInProject("lab1single.txt"));
-            var bytes = Encoding.ASCII.GetBytes(text);
+            var bytes = ConvertHexToBytes(text);
+            var results = new string[256];
             for (var i = 0; i < 256; i++)
             {
                 var result = new byte[bytes.Length];
@@ -25,9 +26,27 @@
                     result[j] = (byte)(bytes[j] ^ i);
                 }
                 var decipherText = Encoding.ASCII.GetString(result);
-                var file = $"{i}".PadLeft(3, '0');
-                File.WriteAllText(GetPathInProject($"results/{file}.txt"), decipherText);
+                results[i] = decipherText;
             }
+            var aggregate = "";
+            for (var i = 0; i < results.Length; i++)
+            {
+                aggregate += $"{i}\n{results[i]}\n<---------->\n";
+            }
+            File.WriteAllText(GetPathInProject($"lab1single-decoded.txt"), aggregate);
+        }
+
+        private static string GetPathInProject(string path)
+        {
+            return $"../../../{path}";
+        }
+
+        private static byte[] ConvertHexToBytes(string text)
+        {
+            return Enumerable.Range(0, text.Length)
+                .Where(x => x % 2 == 0)
+                .Select(x => Convert.ToByte(text.Substring(x, 2), 16))
+                .ToArray();
         }
 
         private static void FromBinaryToText()
@@ -36,11 +55,6 @@
             var bytes = GetBytesFromBinaryString(data);
             var text = Encoding.ASCII.GetString(bytes);
             File.WriteAllText(GetPathInProject("lab1decoded.txt"), text);
-        }
-
-        private static string GetPathInProject(string path)
-        {
-            return $"../../../{path}";
         }
 
         public static byte[] GetBytesFromBinaryString(string binary)
