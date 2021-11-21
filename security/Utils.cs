@@ -6,8 +6,9 @@ namespace security
 
     public class Utils
     {
+        public static string EnglishAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public const double EnglishIC = 0.0667;
-        private const int NumberOfLetters = 26;
+        public const int NumberOfLetters = 26;
 
         public static string GetClosestToEnglish(string[] variants)
         {
@@ -55,15 +56,15 @@ namespace security
                 .Select((i, index) => (i, index))
                 .ToDictionary(p => GetLetter(p.index), p => p.i);
 
-            int GetIndex(char c)
-            {
-                return char.IsUpper(c) ? c - 'A' : c - 'a';
-            }
-
             char GetLetter(int i)
             {
                 return (char)('A' + i);
             }
+        }
+
+        public static int GetIndex(char c)
+        {
+            return char.IsUpper(c) ? c - 'A' : c - 'a';
         }
 
         private static bool IsEnglish(char c)

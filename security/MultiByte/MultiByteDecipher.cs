@@ -21,12 +21,12 @@ namespace security
             decoder = new MultiByteDecoder();
         }
 
-        public (string decipherText, Key key) Decipher(string text)
+        public (string decipherText, MultiByteKey key) Decipher(string text)
         {
             this.text = text;
             var keys = CreateInitialPopulation();
             var generationWithoutChanges = 0;
-            var best = new Key(0);
+            var best = new MultiByteKey(0);
             while (generationWithoutChanges < 1000)
             {
                 var (first, second) = Select(keys);
@@ -44,14 +44,18 @@ namespace security
                 {
                     generationWithoutChanges++;
                 }
+                else
+                {
+                    generationWithoutChanges = 0;
+                }
                 best = keys[0];
             }
             return (decoder.Decode(text, keys[0]), keys[0]);
         }
 
-        private List<Key> CreateInitialPopulation()
+        private List<MultiByteKey> CreateInitialPopulation()
         {
-            var population = new List<Key>();
+            var population = new List<MultiByteKey>();
             for (var i = 0; i < PopulationSize; i++)
             {
                 population.Add(CreateRandomKey());
@@ -59,9 +63,9 @@ namespace security
             return population;
         }
 
-        private Key CreateRandomKey()
+        private MultiByteKey CreateRandomKey()
         {
-            var key = new Key(keyLength);
+            var key = new MultiByteKey(keyLength);
             for (var i = 0; i < keyLength * 8; i++)
             {
                 key.SetBit(i, random.Next(0, 2) == 1);
@@ -69,10 +73,10 @@ namespace security
             return key;
         }
 
-        private (List<Key> first, List<Key> second) Select(List<Key> keys)
+        private (List<MultiByteKey> first, List<MultiByteKey> second) Select(List<MultiByteKey> keys)
         {
-            var first = new List<Key>();
-            var second = new List<Key>();
+            var first = new List<MultiByteKey>();
+            var second = new List<MultiByteKey>();
             var chosen = new List<int>();
             for (var i = 0; i < keys.Count / 2; i++)
             {
@@ -88,7 +92,7 @@ namespace security
             return (first, second);
         }
 
-        private double CalculateScore(Key key)
+        private double CalculateScore(MultiByteKey key)
         {
             var decipherText = decoder.Decode(text, key);
             var frequencies = Utils.CalculateFrequency(decipherText);
@@ -103,9 +107,9 @@ namespace security
             // 0.4 * Math.Abs(Utils.EnglishIC - ic);
         }
 
-        private List<Key> Crossover(List<Key> first, List<Key> second)
+        private List<MultiByteKey> Crossover(List<MultiByteKey> first, List<MultiByteKey> second)
         {
-            var children = new List<Key>();
+            var children = new List<MultiByteKey>();
             for (var i = 0; i < PopulationSize / 2; i++)
             {
                 var (firstChild, secondChild) = Crossover(first[i], second[i]);
@@ -115,10 +119,10 @@ namespace security
             return children;
         }
 
-        private (Key first, Key second) Crossover(Key first, Key second)
+        private (MultiByteKey first, MultiByteKey second) Crossover(MultiByteKey first, MultiByteKey second)
         {
-            var firstChild = new Key(first);
-            var secondChild = new Key(second);
+            var firstChild = new MultiByteKey(first);
+            var secondChild = new MultiByteKey(second);
             var crossoverPoint = random.Next(keyLength * 8);
             for (var i = 0; i < keyLength * 8; i++)
             {
@@ -130,7 +134,7 @@ namespace security
             return (firstChild, secondChild);
         }
 
-        private void Mutate(List<Key> keys)
+        private void Mutate(List<MultiByteKey> keys)
         {
             foreach (var key in keys)
             {
@@ -141,7 +145,7 @@ namespace security
             }
         }
 
-        private void MutateSingle(Key key)
+        private void MutateSingle(MultiByteKey key)
         {
             var numberOfBits = random.Next(keyLength * 8);
             for (var i = 0; i < numberOfBits; i++)

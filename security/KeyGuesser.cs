@@ -3,7 +3,7 @@ namespace security
     using System;
     using System.Text;
 
-    public class MultiByteKeyGuesser
+    public class KeyGuesser
     {
         private const int MaxLength = 64;
 
@@ -15,6 +15,7 @@ namespace security
                 var offsetText = GetOffsetText(text, i);
                 var ic = Utils.CalculateIC(offsetText);
                 ics[i - 1] = ic;
+                Console.WriteLine($"{i},{ic}");
             }
             for (var i = 0; i < ics.Length; i++)
             {

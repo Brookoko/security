@@ -4,23 +4,23 @@ namespace security
     using System.Collections;
     using System.Linq;
 
-    public class Key : IEquatable<Key>
+    public class MultiByteKey : IEquatable<MultiByteKey>
     {
         public int Length => bitArray.Length / 8;
 
         private readonly BitArray bitArray;
 
-        public Key(Key key)
+        public MultiByteKey(MultiByteKey multiByteKey)
         {
-            bitArray = new BitArray(key.bitArray);
+            bitArray = new BitArray(multiByteKey.bitArray);
         }
 
-        public Key(int length)
+        public MultiByteKey(int length)
         {
             bitArray = new BitArray(length * 8);
         }
 
-        public Key(byte[] bytes)
+        public MultiByteKey(byte[] bytes)
         {
             bitArray = new BitArray(bytes);
         }
@@ -47,7 +47,7 @@ namespace security
             return bytes.ToArray();
         }
 
-        public bool Equals(Key other)
+        public bool Equals(MultiByteKey other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -74,7 +74,7 @@ namespace security
             {
                 return false;
             }
-            return Equals((Key)obj);
+            return Equals((MultiByteKey)obj);
         }
 
         public override int GetHashCode()
@@ -82,12 +82,12 @@ namespace security
             return (bitArray != null ? bitArray.GetHashCode() : 0);
         }
 
-        public static bool operator ==(Key left, Key right)
+        public static bool operator ==(MultiByteKey left, MultiByteKey right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Key left, Key right)
+        public static bool operator !=(MultiByteKey left, MultiByteKey right)
         {
             return !Equals(left, right);
         }

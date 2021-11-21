@@ -1,9 +1,13 @@
 namespace security
 {
     using System.Collections.Generic;
+    using System.IO;
 
     public class Frequencies
     {
+        public static readonly Dictionary<string, double> BigramsFrequency = new();
+        public static readonly Dictionary<string, double> TriramsFrequency = new();
+
         public static readonly Dictionary<char, double> SingleLetterFrequency = new()
         {
             { 'A', 0.082 },
@@ -33,5 +37,32 @@ namespace security
             { 'Y', 0.02 },
             { 'Z', 0.00074 },
         };
+
+        static Frequencies()
+        {
+            Populate(BigramsFrequency, "2grams.csv");
+            Populate(TriramsFrequency, "3grams.csv");
+        }
+
+        private static void Populate(Dictionary<string, double> grams, string file)
+        {
+            file = GetPathInProject(file);
+            using var reader = new StreamReader(file);
+            var count = 0;
+            while (count < 200 && !reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                var fields = line.Split(',');
+                var gram = fields[0];
+                var freq = double.Parse(fields[2]);
+                grams[gram] = freq;
+                count++;
+            }
+        }
+
+        private static string GetPathInProject(string path)
+        {
+            return $"../../../{path}";
+        }
     }
 }

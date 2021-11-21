@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using Substitution;
 
     class Program
     {
@@ -12,7 +13,20 @@
         {
             // FromBinaryToText();
             // DecodeSingleByte();
-            DecodeMultiByte();
+            // DecodeMultiByte();
+            DecodeSubstitution();
+        }
+
+        private static void DecodeSubstitution()
+        {
+            var text = File.ReadAllText(GetPathInProject("lab1sub.txt"));
+            var decipher = new SubstitutionDecipher();
+            var (decipherText, key) = decipher.Decipher(text);
+            var testKey = new SubstitutionKey("EOCMLGDQVIBTFWYHZUSPANKXRJ");
+            var decoder = new SubstitutionDecoder();
+            Console.WriteLine($"{key}");
+            Console.WriteLine($"\n\n{decipherText}");
+            Console.WriteLine($"\n\n{decoder.Decode(text, testKey)}");
         }
 
         private static void DecodeMultiByte()
@@ -20,15 +34,13 @@
             var cypherText = File.ReadAllText(GetPathInProject("lab1multi.txt"));
             var bytes = StringEncoder.GetBytes(cypherText);
             var text = StringEncoder.GetString(bytes);
-            var keyGuesser = new MultiByteKeyGuesser();
+            var keyGuesser = new KeyGuesser();
             var length = keyGuesser.GetProbableKeyLength(text);
             var multiByteDecipher = new MultiByteDecipher(length);
             var (decipherText, key) = multiByteDecipher.Decipher(text);
-            var multiByteDecoder = new MultiByteDecoder();
             Console.WriteLine($"{length}");
             Console.WriteLine($"{StringEncoder.GetString(key.ToBytes())}");
             Console.WriteLine($"{decipherText}");
-            Console.WriteLine($"\n\n{multiByteDecoder.Decode(text, "L0l")}");
         }
 
         private static void DecodeSingleByte()
