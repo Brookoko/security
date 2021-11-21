@@ -25,10 +25,9 @@ namespace security
         {
             this.text = text;
             var keys = CreateInitialPopulation();
-            var stringEncoder = new StringEncoder();
             var generationWithoutChanges = 0;
             var best = new Key(0);
-            while (generationWithoutChanges < 100)
+            while (generationWithoutChanges < 1000)
             {
                 var (first, second) = Select(keys);
                 var children = Crossover(first, second);
@@ -46,10 +45,6 @@ namespace security
                     generationWithoutChanges++;
                 }
                 best = keys[0];
-            }
-            foreach (var key in keys)
-            {
-                Console.WriteLine($"{stringEncoder.GetString(key.ToBytes())}\n{decoder.Decode(text, key)}\n<----->");
             }
             return (decoder.Decode(text, keys[0]), keys[0]);
         }
@@ -69,10 +64,6 @@ namespace security
             var key = new Key(keyLength);
             for (var i = 0; i < keyLength * 8; i++)
             {
-                if ((i + 1) % 8 == 0)
-                {
-                    continue;
-                }
                 key.SetBit(i, random.Next(0, 2) == 1);
             }
             return key;
@@ -102,14 +93,14 @@ namespace security
             var decipherText = decoder.Decode(text, key);
             var frequencies = Utils.CalculateFrequency(decipherText);
             var score = 0.0;
-            double total = frequencies.Sum(p => p.Value);
+            double total = decipherText.Length;
             foreach (var (c, freq) in frequencies)
             {
                 score += Math.Abs(Frequencies.SingleLetterFrequency[c] - freq / total);
             }
             var ic = Utils.CalculateIC(decipherText);
-            return 0.2 * (1 - Utils.EnglishLettersCoef(decipherText)) + 0.4 * score +
-                   0.4 * Math.Abs(Utils.EnglishIC - ic);
+            return 0.5 * (1 - Utils.EnglishLettersCoef(decipherText)) + 0.5 * score;
+            // 0.4 * Math.Abs(Utils.EnglishIC - ic);
         }
 
         private List<Key> Crossover(List<Key> first, List<Key> second)
@@ -129,14 +120,12 @@ namespace security
             var firstChild = new Key(first);
             var secondChild = new Key(second);
             var crossoverPoint = random.Next(keyLength * 8);
-            for (var i = 0; i < crossoverPoint; i++)
+            for (var i = 0; i < keyLength * 8; i++)
             {
-                if ((i + 1) % 8 == 0)
-                {
-                    continue;
-                }
-                firstChild.SetBit(i, second.GetBit(i));
-                secondChild.SetBit(i, first.GetBit(i));
+                var firstDonor = i < crossoverPoint ? first : second;
+                var secondDonor = i < crossoverPoint ? second : first;
+                firstChild.SetBit(i, secondDonor.GetBit(i));
+                secondChild.SetBit(i, firstDonor.GetBit(i));
             }
             return (firstChild, secondChild);
         }
@@ -158,10 +147,6 @@ namespace security
             for (var i = 0; i < numberOfBits; i++)
             {
                 var bit = random.Next(keyLength * 8);
-                if ((bit + 1) % 8 == 0)
-                {
-                    continue;
-                }
                 key.SetBit(bit, !key.GetBit(bit));
             }
         }
