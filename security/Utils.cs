@@ -1,12 +1,13 @@
 namespace security
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     public class Utils
     {
+        public const double EnglishIC = 0.0667;
         private const int NumberOfLetters = 26;
-        private const double EnglishIC = 1.73;
 
         public static string GetClosestToEnglish(string[] variants)
         {
@@ -16,7 +17,7 @@ namespace security
                 .First();
         }
 
-        private static double EnglishLettersCoef(string text)
+        public static double EnglishLettersCoef(string text)
         {
             return (double)text.Where(IsEnglish).Count() / text.Length;
         }
@@ -31,26 +32,37 @@ namespace security
             var frequencies = CalculateFrequency(text);
             var total = 0d;
             var sum = 0d;
-            for (var i = 0; i < NumberOfLetters; i++)
+            foreach (var (_, freq) in frequencies)
             {
-                sum += frequencies[i] * (frequencies[i] - 1);
-                total += frequencies[i];
+                sum += freq * (freq - 1);
+                total += freq;
             }
-            return sum / (total * (total - 1) / NumberOfLetters);
+            if (total == 0)
+            {
+                return 0;
+            }
+            return sum / (total * (total - 1));
         }
 
-        private static int[] CalculateFrequency(string text)
+        public static Dictionary<char, int> CalculateFrequency(string text)
         {
             var frequencies = new int[NumberOfLetters];
             foreach (var c in text.Where(IsEnglish))
             {
                 frequencies[GetIndex(c)]++;
             }
-            return frequencies;
+            return frequencies
+                .Select((i, index) => (i, index))
+                .ToDictionary(p => GetLetter(p.index), p => p.i);
 
             int GetIndex(char c)
             {
                 return char.IsUpper(c) ? c - 'A' : c - 'a';
+            }
+
+            char GetLetter(int i)
+            {
+                return (char)('A' + i);
             }
         }
 
