@@ -3,8 +3,10 @@ namespace security
     using System;
     using System.Collections;
     using System.Linq;
+    using System.Text;
+    using Genetic;
 
-    public class MultiByteKey : IEquatable<MultiByteKey>
+    public class MultiByteKey : Key, IEquatable<MultiByteKey>
     {
         public int Length => bitArray.Length / 8;
 
@@ -101,6 +103,11 @@ namespace security
         public static bool operator !=(MultiByteKey left, MultiByteKey right)
         {
             return !Equals(left, right);
+        }
+
+        public override string ToString()
+        {
+            return Encoding.UTF8.GetString(ToBytes());
         }
     }
 }

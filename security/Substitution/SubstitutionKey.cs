@@ -3,8 +3,9 @@ namespace security.Substitution
     using System;
     using System.Linq;
     using System.Text;
+    using Genetic;
 
-    public class SubstitutionKey : IEquatable<SubstitutionKey>
+    public class SubstitutionKey : Key, IEquatable<SubstitutionKey>
     {
         private string alphabet;
 

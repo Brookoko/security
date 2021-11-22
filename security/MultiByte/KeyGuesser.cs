@@ -15,13 +15,14 @@ namespace security
                 var offsetText = GetOffsetText(text, i);
                 var ic = Utils.CalculateIC(offsetText);
                 ics[i - 1] = ic;
+                Console.WriteLine($"{i},{ic}");
             }
             for (var i = 0; i < ics.Length; i++)
             {
                 var ic = ics[i];
                 var next = i > 0 ? ics[i - 1] : ics[i + 1];
                 var diff = ic - next;
-                if (diff > 0.1)
+                if (diff > 0.2)
                 {
                     return i + 1;
                 }

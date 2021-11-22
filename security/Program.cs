@@ -14,7 +14,16 @@
             // FromBinaryToText();
             // DecodeSingleByte();
             // DecodeMultiByte();
-            DecodeSubstitution();
+            // DecodeSubstitution();
+            DecodeVigenere();
+        }
+
+        private static void DecodeVigenere()
+        {
+            var text = File.ReadAllText(GetPathInProject("data/task5.txt"));
+            var keyGuesser = new KeyGuesser();
+            var length = keyGuesser.GetProbableKeyLength(text);
+            Console.WriteLine($"{length}");
         }
 
         private static void DecodeSubstitution()
