@@ -6,32 +6,41 @@ namespace security
 
     public class MultiByteDecipher
     {
-        private const int PopulationSize = 10;
+        private const int NumberOfIterations = 3000;
+        private const int PopulationSize = 100;
+        private const int BestSize = 20;
         private const double MutationProbability = 0.3;
+        private const int NumberOfMutations = 8;
 
         private readonly MultiByteDecoder decoder;
         private readonly Random random;
+        private readonly FitnessCalculator fitnessCalculator;
+        private readonly StringEncoder stringEncoder;
         private readonly int keyLength;
+
         private string text;
 
         public MultiByteDecipher(int keyLength)
         {
-            this.keyLength = keyLength;
             random = new Random();
             decoder = new MultiByteDecoder();
+            fitnessCalculator = new FitnessCalculator();
+            stringEncoder = new StringEncoder();
+            this.keyLength = keyLength;
         }
 
         public (string decipherText, MultiByteKey key) Decipher(string text)
         {
             this.text = text;
             var keys = CreateInitialPopulation();
-            var generationWithoutChanges = 0;
             var best = new MultiByteKey(0);
-            while (generationWithoutChanges < 1000)
+            var count = 0;
+            while (count < NumberOfIterations)
             {
                 var (first, second) = Select(keys);
                 var children = Crossover(first, second);
                 Mutate(children);
+                keys = keys.Take(BestSize).ToList();
                 foreach (var child in children)
                 {
                     if (!keys.Contains(child))
@@ -39,18 +48,17 @@ namespace security
                         keys.Add(child);
                     }
                 }
-                keys = keys.OrderBy(CalculateScore).Take(PopulationSize).ToList();
-                if (best == keys[0])
-                {
-                    generationWithoutChanges++;
-                }
-                else
-                {
-                    generationWithoutChanges = 0;
-                }
+                keys = keys.OrderByDescending(CalculateScore).Take(PopulationSize).ToList();
                 best = keys[0];
+                count++;
+                Console.WriteLine($"{count}<>{stringEncoder.GetString(best.ToBytes())}<>{CalculateScore(best)}");
             }
-            return (decoder.Decode(text, keys[0]), keys[0]);
+            foreach (var key in keys)
+            {
+                Console.WriteLine(
+                    $"{stringEncoder.GetString(key.ToBytes())}\n<>\n{decoder.Decode(text, key)}\n<----->\n");
+            }
+            return (decoder.Decode(text, best), best);
         }
 
         private List<MultiByteKey> CreateInitialPopulation()
@@ -77,40 +85,18 @@ namespace security
         {
             var first = new List<MultiByteKey>();
             var second = new List<MultiByteKey>();
-            var chosen = new List<int>();
-            for (var i = 0; i < keys.Count / 2; i++)
+            for (var i = 0; i + 1 < keys.Count; i += 2)
             {
-                chosen.Add(i);
                 first.Add(keys[i]);
-                var pair = i;
-                while (chosen.Contains(pair))
-                {
-                    pair = random.Next(i + 1, keys.Count);
-                }
-                second.Add(keys[pair]);
+                second.Add(keys[i + 1]);
             }
             return (first, second);
-        }
-
-        private double CalculateScore(MultiByteKey key)
-        {
-            var decipherText = decoder.Decode(text, key);
-            var frequencies = Utils.CalculateFrequency(decipherText);
-            var score = 0.0;
-            double total = decipherText.Length;
-            foreach (var (c, freq) in frequencies)
-            {
-                score += Math.Abs(Frequencies.SingleLetterFrequency[c] - freq / total);
-            }
-            var ic = Utils.CalculateIC(decipherText);
-            return 0.5 * (1 - Utils.EnglishLettersCoef(decipherText)) + 0.5 * score;
-            // 0.4 * Math.Abs(Utils.EnglishIC - ic);
         }
 
         private List<MultiByteKey> Crossover(List<MultiByteKey> first, List<MultiByteKey> second)
         {
             var children = new List<MultiByteKey>();
-            for (var i = 0; i < PopulationSize / 2; i++)
+            for (var i = 0; i < first.Count; i++)
             {
                 var (firstChild, secondChild) = Crossover(first[i], second[i]);
                 children.Add(firstChild);
@@ -140,19 +126,25 @@ namespace security
             {
                 if (random.NextDouble() < MutationProbability)
                 {
-                    MutateSingle(key);
+                    Mutate(key);
                 }
             }
         }
 
-        private void MutateSingle(MultiByteKey key)
+        private void Mutate(MultiByteKey key)
         {
-            var numberOfBits = random.Next(keyLength * 8);
-            for (var i = 0; i < numberOfBits; i++)
+            for (var i = 0; i < NumberOfMutations; i++)
             {
                 var bit = random.Next(keyLength * 8);
                 key.SetBit(bit, !key.GetBit(bit));
             }
+        }
+
+        private double CalculateScore(MultiByteKey key)
+        {
+            var decipherText = decoder.Decode(text, key);
+            var englishCoef = 1 - Utils.EnglishLettersCoef(decipherText);
+            return fitnessCalculator.Calculate(decipherText) * englishCoef;
         }
     }
 }

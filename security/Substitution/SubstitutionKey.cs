@@ -21,7 +21,6 @@ namespace security.Substitution
         public SubstitutionKey()
         {
             alphabet = Utils.EnglishAlphabet;
-            alphabet = "EOCMLGDQVXRTFWYHZUSPANKIBJ";
         }
 
         public void ReplaceWith(int i, char c)

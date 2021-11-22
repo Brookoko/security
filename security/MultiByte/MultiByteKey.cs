@@ -57,7 +57,18 @@ namespace security
             {
                 return true;
             }
-            return Equals(bitArray, other.bitArray);
+            if (Length != other.Length)
+            {
+                return false;
+            }
+            for (var i = 0; i < bitArray.Count; i++)
+            {
+                if (bitArray[i] != other.bitArray[i])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public override bool Equals(object obj)
