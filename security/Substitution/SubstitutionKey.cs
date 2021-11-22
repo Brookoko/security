@@ -7,6 +7,8 @@ namespace security.Substitution
 
     public class SubstitutionKey : Key, IEquatable<SubstitutionKey>
     {
+        public override int Length => alphabet.Length;
+
         private string alphabet;
 
         public SubstitutionKey(string alphabet)

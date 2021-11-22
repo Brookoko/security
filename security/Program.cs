@@ -3,7 +3,9 @@
     using System;
     using System.IO;
     using System.Linq;
+    using Genetic;
     using Substitution;
+    using Vigenere;
 
     class Program
     {
@@ -23,7 +25,10 @@
             var text = File.ReadAllText(GetPathInProject("data/task5.txt"));
             var keyGuesser = new KeyGuesser();
             var length = keyGuesser.GetProbableKeyLength(text);
+            var decipher = new VigenereDecipher(4);
             Console.WriteLine($"{length}");
+            var (decipherText, key) = decipher.Decipher(text);
+            WriteResult(key, decipherText, "task5.txt");
         }
 
         private static void DecodeSubstitution()
@@ -31,13 +36,7 @@
             var text = File.ReadAllText(GetPathInProject("data/task4.txt"));
             var decipher = new SubstitutionDecipher();
             var (decipherText, key) = decipher.Decipher(text);
-            WriteResult(key, decipherText);
-        }
-
-        private static void WriteResult(SubstitutionKey key, string text)
-        {
-            var result = $"{key}\n{text}";
-            File.WriteAllText(GetPathInProject("results/task4.txt"), result);
+            WriteResult(key, decipherText, "task4.txt");
         }
 
         private static void DecodeMultiByte()
@@ -49,13 +48,13 @@
             var length = keyGuesser.GetProbableKeyLength(text);
             var multiByteDecipher = new MultiByteDecipher(length);
             var (decipherText, key) = multiByteDecipher.Decipher(text);
-            WriteResult(length, key, decipherText);
+            WriteResult(key, decipherText, "task3.txt");
         }
 
-        private static void WriteResult(int length, MultiByteKey key, string text)
+        private static void WriteResult(Key key, string text, string path)
         {
-            var result = $"{length}\n{StringEncoder.GetString(key.ToBytes())}\n{text}";
-            File.WriteAllText(GetPathInProject("results/task3.txt"), result);
+            var result = $"{key}\n{text}";
+            File.WriteAllText(GetPathInProject($"results/{path}"), result);
         }
 
         private static void DecodeSingleByte()

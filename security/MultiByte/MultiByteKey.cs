@@ -8,7 +8,9 @@ namespace security
 
     public class MultiByteKey : Key, IEquatable<MultiByteKey>
     {
-        public int Length => bitArray.Length / 8;
+        public override int Length => bitArray.Length;
+
+        public int ByteLength => bitArray.Length / 8;
 
         private readonly BitArray bitArray;
 
@@ -44,7 +46,7 @@ namespace security
 
         public byte[] ToBytes()
         {
-            var bytes = new byte[Length];
+            var bytes = new byte[ByteLength];
             bitArray.CopyTo(bytes, 0);
             return bytes.ToArray();
         }

@@ -6,11 +6,11 @@ namespace security.Genetic
 
     public abstract class GeneticAlgorithm<T> where T : Key
     {
-        private const int NumberOfIterations = 3000;
-        private const int PopulationSize = 1000;
-        private const int BestSize = 20;
-        private const double MutationProbability = 0.2;
-        private const int NumberOfMutations = 1;
+        protected abstract int NumberOfIterations { get; }
+        protected abstract int PopulationSize { get; }
+        protected abstract int BestSize { get; }
+        protected abstract double MutationProbability { get; }
+        protected abstract int NumberOfMutations { get; }
 
         protected readonly Random random = new();
         private readonly FitnessCalculator fitnessCalculator = new();
@@ -89,7 +89,7 @@ namespace security.Genetic
 
         private T Crossover(T first, T second)
         {
-            var crossoverPoint = random.Next(Utils.NumberOfLetters);
+            var crossoverPoint = random.Next(first.Length);
             var isFirst = random.Next(2) == 1;
             var firstDonor = isFirst ? first : second;
             var secondDonor = isFirst ? second : first;

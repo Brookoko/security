@@ -1,6 +1,7 @@
 namespace security.Genetic
 {
-    public class Key
+    public abstract class Key
     {
+        public abstract int Length { get; }
     }
 }
