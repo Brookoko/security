@@ -9,6 +9,7 @@ namespace security
         public static string EnglishAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public const double EnglishIC = 0.0667;
         public const int NumberOfLetters = 26;
+        private static readonly Random Random = new();
 
         public static string GetClosestToEnglish(string[] variants)
         {
@@ -70,6 +71,11 @@ namespace security
         private static bool IsEnglish(char c)
         {
             return c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
+        }
+
+        public static char GetRandomLetter()
+        {
+            return EnglishAlphabet[Random.Next(NumberOfLetters)];
         }
     }
 }

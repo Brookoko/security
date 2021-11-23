@@ -15,9 +15,9 @@
         {
             // FromBinaryToText();
             // DecodeSingleByte();
-            // DecodeMultiByte();
+            DecodeMultiByte();
             // DecodeSubstitution();
-            DecodeVigenere();
+            // DecodeVigenere();
         }
 
         private static void DecodeVigenere()
@@ -51,7 +51,7 @@
             WriteResult(key, decipherText, "task3.txt");
         }
 
-        private static void WriteResult(Key key, string text, string path)
+        private static void WriteResult<T>(Key<T> key, string text, string path) where T : Key<T>
         {
             var result = $"{key}\n{text}";
             File.WriteAllText(GetPathInProject($"results/{path}"), result);

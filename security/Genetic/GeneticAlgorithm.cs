@@ -4,7 +4,7 @@ namespace security.Genetic
     using System.Collections.Generic;
     using System.Linq;
 
-    public abstract class GeneticAlgorithm<T> where T : Key
+    public abstract class GeneticAlgorithm<T> where T : Key<T>
     {
         protected abstract int NumberOfIterations { get; }
         protected abstract int PopulationSize { get; }
@@ -60,7 +60,15 @@ namespace security.Genetic
             return population;
         }
 
-        protected abstract T CreateRandomKey();
+        private T CreateRandomKey()
+        {
+            var key = CreateEmpty();
+            for (var i = 0; i < key.Length; i++)
+            {
+                key.Mutate(i);
+            }
+            return key;
+        }
 
         protected abstract T CreateEmpty();
 
@@ -93,10 +101,15 @@ namespace security.Genetic
             var isFirst = random.Next(2) == 1;
             var firstDonor = isFirst ? first : second;
             var secondDonor = isFirst ? second : first;
-            return Crossover(firstDonor, secondDonor, crossoverPoint);
+            var child = CreateEmpty();
+            for (var i = 0; i < child.Length; i++)
+            {
+                var donor = i < crossoverPoint ? firstDonor : secondDonor;
+                child.GetGenFrom(i, donor);
+            }
+            child.AfterCrossover();
+            return child;
         }
-
-        protected abstract T Crossover(T firstDonor, T secondDonor, int crossoverPoint);
 
         private void Mutate(List<T> keys)
         {
@@ -113,11 +126,10 @@ namespace security.Genetic
         {
             for (var i = 0; i < NumberOfMutations; i++)
             {
-                Mutate(key, NumberOfMutations);
+                var index = random.Next(key.Length);
+                key.Mutate(index);
             }
         }
-
-        protected abstract void Mutate(T key, int numberOfMutations);
 
         private double CalculateScore(string text, T key)
         {

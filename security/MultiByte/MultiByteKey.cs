@@ -6,7 +6,7 @@ namespace security
     using System.Text;
     using Genetic;
 
-    public class MultiByteKey : Key, IEquatable<MultiByteKey>
+    public class MultiByteKey : Key<MultiByteKey>, IEquatable<MultiByteKey>
     {
         public override int Length => bitArray.Length;
 
@@ -29,19 +29,14 @@ namespace security
             bitArray = new BitArray(bytes);
         }
 
-        public bool GetBit(int index)
+        public override void GetGenFrom(int index, MultiByteKey key)
         {
-            return bitArray.Get(GetIndex(index));
+            this[index] = key[index];
         }
 
-        public void SetBit(int index, bool bit)
+        public override void Mutate(int index)
         {
-            bitArray.Set(GetIndex(index), bit);
-        }
-
-        private int GetIndex(int index)
-        {
-            return index;
+            this[index] = !this[index];
         }
 
         public byte[] ToBytes()
@@ -110,6 +105,12 @@ namespace security
         public override string ToString()
         {
             return Encoding.UTF8.GetString(ToBytes());
+        }
+
+        public bool this[int i]
+        {
+            get => bitArray[i];
+            set => bitArray[i] = value;
         }
     }
 }

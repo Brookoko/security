@@ -4,7 +4,7 @@ namespace security.Vigenere
     using System.Text;
     using Genetic;
 
-    public class VigenereKey : Key, IEquatable<VigenereKey>
+    public class VigenereKey : Key<VigenereKey>, IEquatable<VigenereKey>
     {
         public override int Length => alphabet.Length;
 
@@ -27,14 +27,26 @@ namespace security.Vigenere
             alphabet = key.alphabet;
         }
 
-        public void Set(int i, char c)
+        public override void GetGenFrom(int index, VigenereKey key)
+        {
+            Set(index, key[index]);
+        }
+
+        public override void Mutate(int index)
+        {
+            var letter = Utils.GetRandomLetter();
+            Set(index, letter);
+        }
+
+        private void Set(int index, char letter)
         {
             var builder = new StringBuilder(alphabet)
             {
-                [i] = c,
+                [index] = letter,
             };
             alphabet = builder.ToString();
         }
+
 
         public bool Equals(VigenereKey other)
         {

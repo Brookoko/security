@@ -5,7 +5,7 @@ namespace security.Substitution
     using System.Text;
     using Genetic;
 
-    public class SubstitutionKey : Key, IEquatable<SubstitutionKey>
+    public class SubstitutionKey : Key<SubstitutionKey>, IEquatable<SubstitutionKey>
     {
         public override int Length => alphabet.Length;
 
@@ -26,28 +26,29 @@ namespace security.Substitution
             alphabet = Utils.EnglishAlphabet;
         }
 
-        public void ReplaceWith(int i, char c)
+        public override void GetGenFrom(int index, SubstitutionKey key)
         {
-            var temp = alphabet[i];
-            var index = alphabet.IndexOf(c);
             var builder = new StringBuilder(alphabet)
             {
-                [i] = c,
-                [index] = temp
+                [index] = key[index],
             };
             alphabet = builder.ToString();
         }
 
-        public void Set(int i, char c)
+        public override void Mutate(int index)
         {
+            var letter = Utils.GetRandomLetter();
+            var temp = alphabet[index];
+            var letterIndex = alphabet.IndexOf(letter);
             var builder = new StringBuilder(alphabet)
             {
-                [i] = c,
+                [index] = letter,
+                [letterIndex] = temp
             };
             alphabet = builder.ToString();
         }
 
-        public void CorrectAlphabet()
+        public override void AfterCrossover()
         {
             var charsToInsert = Utils.EnglishAlphabet.Where(c => !alphabet.Contains(c)).ToList();
             var charsToRemove = alphabet
