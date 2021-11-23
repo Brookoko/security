@@ -6,9 +6,9 @@ namespace security
     {
         public double Calculate(string text)
         {
-            return 0.33 * CalculateUnigramsScore(text) +
-                   0.33 * CalculateBigramsScore(text) +
-                   0.33 * CalculateTrigramsScore(text);
+            return 0.2 * CalculateUnigramsScore(text) +
+                   0.3 * CalculateBigramsScore(text) +
+                   0.5 * CalculateTrigramsScore(text);
         }
 
         private double CalculateUnigramsScore(string text)

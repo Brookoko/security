@@ -14,19 +14,9 @@ namespace security
 
         private readonly BitArray bitArray;
 
-        public MultiByteKey(MultiByteKey multiByteKey)
-        {
-            bitArray = new BitArray(multiByteKey.bitArray);
-        }
-
         public MultiByteKey(int length)
         {
             bitArray = new BitArray(length * 8);
-        }
-
-        public MultiByteKey(byte[] bytes)
-        {
-            bitArray = new BitArray(bytes);
         }
 
         public override void GetGenFrom(int index, MultiByteKey key)

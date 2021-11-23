@@ -11,16 +11,6 @@ namespace security.Substitution
 
         private string alphabet;
 
-        public SubstitutionKey(string alphabet)
-        {
-            this.alphabet = alphabet;
-        }
-
-        public SubstitutionKey(SubstitutionKey key)
-        {
-            alphabet = key.alphabet;
-        }
-
         public SubstitutionKey()
         {
             alphabet = Utils.EnglishAlphabet;
@@ -50,6 +40,7 @@ namespace security.Substitution
 
         public override void AfterCrossover()
         {
+            base.AfterCrossover();
             var charsToInsert = Utils.EnglishAlphabet.Where(c => !alphabet.Contains(c)).ToList();
             var charsToRemove = alphabet
                 .Select((c, i) => (c, i))

@@ -17,16 +17,6 @@ namespace security.Vigenere
             alphabet = line.Substring(0, length);
         }
 
-        public VigenereKey(string alphabet)
-        {
-            this.alphabet = alphabet;
-        }
-
-        public VigenereKey(VigenereKey key)
-        {
-            alphabet = key.alphabet;
-        }
-
         public override void GetGenFrom(int index, VigenereKey key)
         {
             Set(index, key[index]);

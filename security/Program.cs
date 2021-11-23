@@ -4,6 +4,7 @@
     using System.IO;
     using System.Linq;
     using Genetic;
+    using PolySubstitution;
     using Substitution;
     using Vigenere;
 
@@ -15,9 +16,21 @@
         {
             // FromBinaryToText();
             // DecodeSingleByte();
-            DecodeMultiByte();
+            // DecodeMultiByte();
             // DecodeSubstitution();
             // DecodeVigenere();
+            DecodePolySubstitution();
+        }
+
+        private static void DecodePolySubstitution()
+        {
+            var text = File.ReadAllText(GetPathInProject("data/task5.txt"));
+            var keyGuesser = new KeyGuesser();
+            var length = keyGuesser.GetProbableKeyLength(text);
+            Console.WriteLine($"{length}");
+            var decipher = new PolySubstitutionDecipher(4);
+            var (decipherText, key) = decipher.Decipher(text);
+            WriteResult(key, decipherText, "task5.txt");
         }
 
         private static void DecodeVigenere()
