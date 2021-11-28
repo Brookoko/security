@@ -12,6 +12,8 @@ namespace Lab3.Data
 
         public long BetNumber { get; set; }
 
+        public bool IsWon => RealNumber == BetNumber;
+
         public override string ToString()
         {
             return $"Game result: {Message}\nBet: {Bet}\nBet number: {BetNumber}\nReal number: {RealNumber}";

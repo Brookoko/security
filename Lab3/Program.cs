@@ -5,6 +5,8 @@
     using Cracker;
     using Data;
     using Generators;
+    using MersenneTwister;
+    using PseudoRandom;
 
     public class Program
     {
@@ -14,7 +16,8 @@
 
         private static async Task Main(string[] args)
         {
-            await PlayLcg();
+            // await PlayLcg();
+            await PlayMt();
         }
 
         private static async Task PlayLcg()
@@ -37,6 +40,34 @@
             {
                 var result = await NetworkWorker.Play(account, BetMoney, lcg.Next(), Mode.Lcg);
                 Console.WriteLine(result);
+            }
+        }
+
+        private static async Task PlayMt()
+        {
+            var account = await CreateNewAccount();
+
+            var seed = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 1;
+            var mt = new MersenneTwister();
+            mt.init_genrand((ulong)seed);
+            var playedGames = 0;
+            Console.WriteLine($"Seed: {seed}");
+
+            while (account.Money < TargetMoney)
+            {
+                var result = await NetworkWorker.Play(account, BetMoney, (uint)mt.genrand_uint32(), Mode.Mt);
+                Console.WriteLine(result);
+                playedGames++;
+                if (!result.IsWon)
+                {
+                    Console.WriteLine($"Seed is wrong. Try to correct seed");
+                    seed -= 1;
+                    mt.init_genrand((ulong)seed);
+                    for (var i = 0; i < playedGames; i++)
+                    {
+                        mt.genrand_uint32();
+                    }
+                }
             }
         }
 
