@@ -16,7 +16,8 @@
         private static async Task Main(string[] args)
         {
             // await PlayLcg();
-            await PlayMt();
+            // await PlayMt();
+            await PlayBetterMt();
         }
 
         private static async Task PlayLcg()
@@ -67,6 +68,30 @@
                         mt.genrand_uint32();
                     }
                 }
+            }
+        }
+
+        private static async Task PlayBetterMt()
+        {
+            var account = await CreateNewAccount();
+
+            var sequence = new long[624];
+            for (var i = 0; i < 624; i++)
+            {
+                var result = await NetworkWorker.Play(account, 1, 1, Mode.BetterMt);
+                sequence[i] = result.RealNumber;
+            }
+
+            var mtCracker = new MtCracker();
+            var state = mtCracker.GetState(sequence);
+            var mt = new MersenneTwister();
+            mt.SetState(state);
+
+            while (account.Money < TargetMoney)
+            {
+                var number = (uint)mt.genrand_uint32();
+                var result = await NetworkWorker.Play(account, BetMoney, number, Mode.BetterMt);
+                Console.WriteLine(result);
             }
         }
 
