@@ -8,7 +8,7 @@ namespace Lab3.Data
 
         public long RealNumber { get; set; }
 
-        public int Bet { get; set; }
+        public long Bet { get; set; }
 
         public long BetNumber { get; set; }
 
