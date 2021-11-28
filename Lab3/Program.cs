@@ -5,7 +5,6 @@
     using Cracker;
     using Data;
     using Generators;
-    using MersenneTwister;
     using PseudoRandom;
 
     public class Program
